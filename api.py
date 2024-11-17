@@ -50,7 +50,7 @@ async def predict(image: UploadFile = File(...)):
         # Prédire la classe avec SVM
         print(features)
         prediction = svm_model.predict(features)
-        class_name = "Class 1" if prediction[0] == 1 else "Class 0"
+        class_name = "Chien" if prediction[0] == 1 else "Chat"
 
         return {"prediction": class_name}
     except Exception as e:

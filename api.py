@@ -1,5 +1,6 @@
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware 
 import numpy as np
 import joblib
 from tensorflow.keras.applications import MobileNetV2
@@ -9,7 +10,14 @@ from tensorflow.keras.preprocessing.image import load_img, img_to_array
 
 # Initialisation de l'application FastAPI
 app = FastAPI()
-
+# Configuration CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Permet toutes les origines
+    allow_credentials=True,
+    allow_methods=["*"],  # Permet toutes les méthodes
+    allow_headers=["*"],  # Permet tous les headers
+)
 # Charger le modèle SVM
 svm_model = joblib.load('model/svm_model.pkl')
 
@@ -18,6 +26,9 @@ base_model = MobileNetV2(weights='imagenet', include_top=False, input_shape=(224
 x = GlobalAveragePooling2D()(base_model.output)
 feature_extractor = Model(inputs=base_model.input, outputs=x)
 
+@app.get('/')
+def index():
+    return {"message":"Bienvenue sur mon api"}
 @app.post("/predict")
 async def predict(image: UploadFile = File(...)):
     try:
